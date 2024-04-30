@@ -1,4 +1,4 @@
-# normidi
+# midilint
 CLI Midi normalizer
 
 This program reads a .mid file and processes it with various functions, outputting a new midi file.
@@ -14,7 +14,7 @@ pip3 install --user -r --break-system-packages requirements.txt
 
 # Usage
 ```
-usage: normidi.py [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] SOURCE DEST
+usage: midilint.py [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] SOURCE DEST
 
 Read SOURCE midi file and save processed version to DEST
 
@@ -32,6 +32,6 @@ options:
 For example, to set the velocity of all notes in 'my_file.mid' to 150 and
 save it as my_file_normalized.mid:
 ```
-python3 normidi.py --velocity=150 /path/to/my_file.mid /path/to/new/my_file_normalized.mid
+python3 midilint.py --velocity=150 /path/to/my_file.mid /path/to/new/my_file_normalized.mid
 ```
 
