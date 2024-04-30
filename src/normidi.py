@@ -103,7 +103,7 @@ def main(source: Path, dest: Path, args) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog=f"{Path(__file__).name}",
-        description="normalize SOURCE midi file and save it to DEST",
+        description="Read SOURCE midi file and save processed version to DEST",
     )
 
     parser.add_argument("SOURCE", type=Path, help="the midi file to normalize")

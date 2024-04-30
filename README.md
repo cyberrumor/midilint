@@ -1,9 +1,11 @@
 # normidi
 CLI Midi normalizer
 
-This program reads a .mid file and sets all note velocities to the specified value.
+This program reads a .mid file and processes it with various functions, outputting a new midi file.
 
-Note velocities can be 0 through 127 (inclusive).
+Features:
+- Normalization. Set all notes to a particular velocity.
+- Pitch correction. Snap all notes to the specified key.
 
 # Runtime dependencies
 ```
@@ -12,9 +14,9 @@ pip3 install --user -r --break-system-packages requirements.txt
 
 # Usage
 ```
-usage: normidi.py [-h] [--velocity VELOCITY] SOURCE DEST
+usage: normidi.py [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] SOURCE DEST
 
-normalize SOURCE midi file and save it to DEST
+Read SOURCE midi file and save processed version to DEST
 
 positional arguments:
   SOURCE               the midi file to normalize
@@ -23,6 +25,8 @@ positional arguments:
 options:
   -h, --help           show this help message and exit
   --velocity VELOCITY  the velocity to set all notes to
+  --key KEY            the key to snap notes to. E.g. c_major or e_phrygian.
+  --strategy STRATEGY  note snapping algorithm. 'up', 'down', or 'nearest'
 ```
 
 For example, to set the velocity of all notes in 'my_file.mid' to 150 and
