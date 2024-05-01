@@ -6,6 +6,6 @@ setup(
     description="A midi normalizer, transposer, and note aligner.",
     author="cyberrumor",
     url="https://github.com/cyberrumor/midilint",
-    packages=[],
+    packages=["midilint"],
     scripts=["bin/midilint"],
 )
