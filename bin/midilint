@@ -23,9 +23,9 @@ def main(source: Path, dest: Path, args) -> None:
     # pitch correction
     if args.key is not None:
         strats = {
-            "up": shift_up,
-            "down": shift_down,
-            "nearest": shift_nearest,
+            "up": midilint.shift_up,
+            "down": midilint.shift_down,
+            "nearest": midilint.shift_nearest,
         }
         key = midi_abstraction.Key(args.key)
         mid = midilint.correct_pitch(mid, key, strats[args.strategy])

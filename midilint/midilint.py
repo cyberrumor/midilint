@@ -28,13 +28,11 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
     To prevent shortening or lengthening, we have to track how far the previous
     note was shifted and accommodate the note after it.
     """
-    if bin(source.ticks_per_beat).count('1') != 1:
-        # ticks_per_beat aren't a power of 2.
-        raise ValueError(f"Found track with {source.ticks_per_beat=} which was required to be a power of 2.")
+    if source.ticks_per_beat % 2 != 0:
+        raise ValueError(f"Found track with {source.ticks_per_beat=} which was required to divisible by 2.")
 
-    if bin(precision).count('1') != 1:
-        # precision isn't a power of 2.
-        raise ValueError(f"Precision was {precision} but was required to be a power of 2.")
+    if precision > 1 and precision % 2 != 0:
+        raise ValueError(f"Found argument {precision=} which was required to be 1 or divisible by 2.")
 
     tick = source.ticks_per_beat // precision
 
