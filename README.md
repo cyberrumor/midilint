@@ -1,12 +1,15 @@
 # midilint
 
-Transposes, normalizes, and aligns midi notes.
+Transpose, normalize, and align midi notes.
 
 
 Features:
 - Normalization. Set all notes to a particular velocity.
 - Pitch correction. Snap all notes to the specified key.
   This is naive and not the same as transposing.
+- Align notes to intervals. Snap the start and end of notes
+  to quarter note intervals or smaller depending on desired
+  precision.
 
 # Installation
 
@@ -36,18 +39,24 @@ pip3 install --user --break-system-packages .
 # Usage
 
 ```
-usage: midilint.py [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] SOURCE DEST
+usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] [--align]
+                [--precision PRECISION]
+                SOURCE DEST
 
 Read SOURCE midi file and save processed version to DEST
 
 positional arguments:
-  SOURCE               the midi file to normalize
-  DEST                 the name of the output file
+  SOURCE                the midi file to normalize
+  DEST                  the name of the output file
 
 options:
-  -h, --help           show this help message and exit
-  --velocity VELOCITY  the velocity to set all notes to
-  --key KEY            the key to snap notes to. E.g. c_major or e_phrygian.
-  --strategy STRATEGY  note snapping algorithm. 'up', 'down', or 'nearest'
+  -h, --help            show this help message and exit
+  --velocity VELOCITY   the velocity to set all notes to
+  --key KEY             the key to snap notes to. E.g. c_major or e_phrygian.
+  --strategy STRATEGY   note snapping algorithm. 'up', 'down', or 'nearest'
+  --align               align the start and end of notes to intervals
+  --precision PRECISION
+                        determines the size of the interval to align to. 1 is quarter note,
+                        2 is eighth, 4 is sixteenth, etc
 ```
 

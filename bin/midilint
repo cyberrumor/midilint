@@ -9,6 +9,7 @@ import midi_abstraction
 
 import midilint
 
+
 def main(source: Path, dest: Path, args) -> None:
     """
     Parse source, manipulate, save to dest.
@@ -28,6 +29,10 @@ def main(source: Path, dest: Path, args) -> None:
         }
         key = midi_abstraction.Key(args.key)
         mid = midilint.correct_pitch(mid, key, strats[args.strategy])
+
+    # note alignment
+    if args.align:
+        mid = midilint.align(mid, args.precision)
 
     mid.save(dest)
 
@@ -53,6 +58,19 @@ if __name__ == "__main__":
         type=str,
         default="nearest",
         help="note snapping algorithm. 'up', 'down', or 'nearest'",
+    )
+
+    parser.add_argument(
+        "--align",
+        action="store_true",
+        help="align the start and end of notes to intervals"
+    )
+
+    parser.add_argument(
+        "--precision",
+        type=int,
+        default=1,
+        help="determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc"
     )
 
     args = parser.parse_args()
