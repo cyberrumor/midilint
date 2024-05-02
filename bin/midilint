@@ -43,7 +43,7 @@ if __name__ == "__main__":
         description="Read SOURCE midi file and save processed version to DEST",
     )
 
-    parser.add_argument("SOURCE", type=Path, help="the midi file to normalize")
+    parser.add_argument("SOURCE", type=Path, help="the midi file to lint")
 
     parser.add_argument("DEST", type=Path, help="the name of the output file")
 

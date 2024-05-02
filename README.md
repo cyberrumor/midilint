@@ -46,7 +46,7 @@ usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] [--
 Read SOURCE midi file and save processed version to DEST
 
 positional arguments:
-  SOURCE                the midi file to normalize
+  SOURCE                the midi file to lint
   DEST                  the name of the output file
 
 options:
