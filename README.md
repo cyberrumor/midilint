@@ -39,9 +39,7 @@ pip3 install --user --break-system-packages .
 # Usage
 
 ```
-usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--strategy STRATEGY] [--align]
-                [--precision PRECISION]
-                SOURCE DEST
+usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--align] [--precision PRECISION] SOURCE DEST
 
 Read SOURCE midi file and save processed version to DEST
 
@@ -53,10 +51,9 @@ options:
   -h, --help            show this help message and exit
   --velocity VELOCITY   the velocity to set all notes to
   --key KEY             the key to snap notes to. E.g. c_major or e_phrygian.
-  --strategy STRATEGY   note snapping algorithm. 'up', 'down', or 'nearest'
   --align               align the start and end of notes to intervals
   --precision PRECISION
-                        determines the size of the interval to align to. 1 is quarter note,
-                        2 is eighth, 4 is sixteenth, etc
+                        determines the size of the interval to align to. 1 is quarter note, 2 is
+                        eighth, 4 is sixteenth, etc
 ```
 

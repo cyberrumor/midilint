@@ -22,13 +22,8 @@ def main(source: Path, dest: Path, args) -> None:
 
     # pitch correction
     if args.key is not None:
-        strats = {
-            "up": midilint.shift_up,
-            "down": midilint.shift_down,
-            "nearest": midilint.shift_nearest,
-        }
         key = midi_abstraction.Key(args.key)
-        mid = midilint.correct_pitch(mid, key, strats[args.strategy])
+        mid = midilint.correct_pitch(mid, key)
 
     # note alignment
     if args.align:
@@ -54,23 +49,16 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--strategy",
-        type=str,
-        default="nearest",
-        help="note snapping algorithm. 'up', 'down', or 'nearest'",
-    )
-
-    parser.add_argument(
         "--align",
         action="store_true",
-        help="align the start and end of notes to intervals"
+        help="align the start and end of notes to intervals",
     )
 
     parser.add_argument(
         "--precision",
         type=int,
         default=1,
-        help="determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc"
+        help="determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc",
     )
 
     args = parser.parse_args()
@@ -93,19 +81,12 @@ if __name__ == "__main__":
     if args.key is not None:
         keys = []
         for n in midi_abstraction.list_notes():
-            for m in midi_abstraction.list_modes():
+            for m in midi_abstraction.list_modes() + ["major", "minor"]:
                 keys.append(f"{n}_{m}")
         if args.key not in keys:
             raise ValueError(
                 f"key was {args.key} but must be one of:\n{'\n'.join(keys)}"
             )
-
-        # If a key was passed, we need to validate the strategy.
-        assert args.strategy in [
-            "up",
-            "down",
-            "nearest",
-        ], f"strategy was {args.strategy} but must be one of 'up', 'down', or 'nearest'."
 
     source = args.SOURCE.absolute()
     dest = args.DEST.absolute()

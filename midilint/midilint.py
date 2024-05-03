@@ -29,10 +29,14 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
     note was shifted and accommodate the note after it.
     """
     if source.ticks_per_beat % 2 != 0:
-        raise ValueError(f"Found track with {source.ticks_per_beat=} which was required to divisible by 2.")
+        raise ValueError(
+            f"Found track with {source.ticks_per_beat=} which was required to divisible by 2."
+        )
 
     if precision > 1 and precision % 2 != 0:
-        raise ValueError(f"Found argument {precision=} which was required to be 1 or divisible by 2.")
+        raise ValueError(
+            f"Found argument {precision=} which was required to be 1 or divisible by 2."
+        )
 
     tick = source.ticks_per_beat // precision
 
@@ -50,36 +54,6 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
     return source
 
 
-def shift_up(track: mido.MidiTrack, notes: list[int]) -> None:
-    """
-    Change pitch into the key by shifting notes up.
-    """
-    for message in track:
-        if message.type not in ("note_on", "note_off"):
-            continue
-        # Raise the note until it's in the key.
-        while message.note < 127 and message.note not in notes:
-            message.note += 1
-        # If we raised it too high, we will have to do the opposite.
-        while message.note > 0 and message.note not in notes:
-            message.note -= 1
-
-
-def shift_down(track: mido.MidiTrack, notes: list[int]) -> None:
-    """
-    Change pitch into the key by shifting notes down.
-    """
-    for message in track:
-        if message.type not in ("note_on", "note_off"):
-            continue
-        # Lower the note until it's in the key.
-        while message.note > 0 and message.note not in notes:
-            message.note -= 1
-        # If we lowered too far, we will have to do the opposite.
-        while message.note < 127 and message.note not in notes:
-            message.note += 1
-
-
 def shift_nearest(track: mido.MidiTrack, notes: list[int]) -> None:
     """
     Change pitch into the key by shifting notes to the nearest note in key.
@@ -94,7 +68,6 @@ def shift_nearest(track: mido.MidiTrack, notes: list[int]) -> None:
 def correct_pitch(
     source: mido.MidiFile,
     key: midi_abstraction.Key,
-    strategy: Callable[[mido.Message], None],
 ) -> mido.MidiFile:
     """
     Snap pitches to notes in the given key via the strategy.
@@ -105,6 +78,6 @@ def correct_pitch(
         notes.extend(midi_abstraction.notes(n))
 
     for track in source.tracks:
-        strategy(track, notes)
+        shift_nearest(track, notes)
 
     return source
