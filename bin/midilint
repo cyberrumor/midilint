@@ -35,12 +35,16 @@ def main(source: Path, dest: Path, args) -> None:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog=f"{Path(__file__).name}",
-        description="Read SOURCE midi file and save processed version to DEST",
+        description="The midi linter.",
     )
 
     parser.add_argument("SOURCE", type=Path, help="the midi file to lint")
 
-    parser.add_argument("DEST", type=Path, help="the name of the output file")
+    parser.add_argument(
+        "DEST",
+        type=Path,
+        help="the name of the output file",
+    )
 
     parser.add_argument("--velocity", type=int, help="the velocity to set all notes to")
 

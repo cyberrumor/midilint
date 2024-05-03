@@ -54,17 +54,6 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
     return source
 
 
-def shift_nearest(track: mido.MidiTrack, notes: list[int]) -> None:
-    """
-    Change pitch into the key by shifting notes to the nearest note in key.
-    """
-    # Get the absolute value of the difference between each item in
-    # the list and message.note, and pick the smallest amongst them.
-    for message in track:
-        if message.type in ("note_on", "note_off"):
-            message.note = min(notes, key=lambda x: abs(x - message.note))
-
-
 def correct_pitch(
     source: mido.MidiFile,
     key: midi_abstraction.Key,
@@ -78,6 +67,7 @@ def correct_pitch(
         notes.extend(midi_abstraction.notes(n))
 
     for track in source.tracks:
-        shift_nearest(track, notes)
-
+        for message in track:
+            if message.type in ("note_on", "note_off"):
+                message.note = min(notes, key=lambda x: abs(x - message.note))
     return source
