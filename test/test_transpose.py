@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 import mido
-import midi_abstraction
+import midi_abstraction as mab
 import midilint
 
 SOURCE = Path(__file__).parent / "files/c4_to_c5.mid"
@@ -109,8 +109,9 @@ SOURCE = Path(__file__).parent / "files/c4_to_c5.mid"
 )
 def test_correct_pitch(key, expected):
     mid = mido.MidiFile(SOURCE, clip=True)
-    key = midi_abstraction.Key(key)
-    mid = midilint.correct_pitch(mid, key)
+    note, mode = key.split("_")
+    notes = getattr(mab, mode.upper()).notes(note)
+    mid = midilint.correct_pitch(mid, notes)
 
     i = 0
     for track in mid.tracks:

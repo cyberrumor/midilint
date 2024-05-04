@@ -5,16 +5,23 @@ from pathlib import Path
 from typing import Callable
 
 import mido
-import midi_abstraction
+import midi_abstraction as mab
 
 import midilint
 
 
-def main(source: Path, dest: Path, args) -> None:
+def main(source: Path, args) -> None:
     """
     Parse source, manipulate, save to dest.
     """
     mid = mido.MidiFile(source, clip=True)
+
+
+    # Identify then exit
+    if args.identify:
+        for k, v in midilint.identify(mid).items():
+            print(f"{k:<20} {v}")
+        return
 
     # normalize
     if args.velocity is not None:
@@ -22,14 +29,20 @@ def main(source: Path, dest: Path, args) -> None:
 
     # pitch correction
     if args.key is not None:
-        key = midi_abstraction.Key(args.key)
-        mid = midilint.correct_pitch(mid, key)
+        note, mode = args.key.split("_")
+        notes = getattr(mab, mode.upper()).notes(note)
+        mid = midilint.correct_pitch(mid, notes)
 
     # note alignment
     if args.align:
         mid = midilint.align(mid, args.precision)
 
-    mid.save(dest)
+    # Save to dest if it was provided, otherwise
+    # overwrite input file.
+    if args.DEST is not None:
+        mid.save(args.DEST)
+    else:
+        mid.save(source)
 
 
 if __name__ == "__main__":
@@ -44,6 +57,7 @@ if __name__ == "__main__":
         "DEST",
         type=Path,
         help="the name of the output file",
+        nargs="?",
     )
 
     parser.add_argument("--velocity", type=int, help="the velocity to set all notes to")
@@ -65,14 +79,21 @@ if __name__ == "__main__":
         help="determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc",
     )
 
+    parser.add_argument(
+        "--identify",
+        action="store_true",
+        help="read information about a file"
+    )
+
     args = parser.parse_args()
 
     # Raise FileNotFoundError if SOURCE doesn't exist.
     args.SOURCE.resolve()
 
     # Ensure DEST doesn't already exist.
-    if args.DEST.absolute().exists():
-        raise FileExistsError(args.DEST)
+    if args.DEST is not None:
+        if args.DEST.absolute().exists():
+            raise FileExistsError(args.DEST)
 
     # Validate that velocity is 0-127.
     if args.velocity is not None:
@@ -84,14 +105,13 @@ if __name__ == "__main__":
     # Validate key
     if args.key is not None:
         keys = []
-        for n in midi_abstraction.list_notes():
-            for m in midi_abstraction.list_modes() + ["major", "minor"]:
-                keys.append(f"{n}_{m}")
+        for n in list(mab.Note):
+            for m in list(mab.Mode):
+                keys.append(f"{n.value}_{m.value}")
         if args.key not in keys:
             raise ValueError(
                 f"key was {args.key} but must be one of:\n{'\n'.join(keys)}"
             )
 
     source = args.SOURCE.absolute()
-    dest = args.DEST.absolute()
-    main(source, dest, args)
+    main(source, args)
