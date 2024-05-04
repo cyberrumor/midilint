@@ -15,10 +15,13 @@ def identify(source: mido.MidiFile) -> mido.MidiFile:
     # Note durations
     note_duration_min = 2**31 - 1
     note_duration_max = 0
+    note_durations = {}
+
+    # Track all notes and velocities.
     velocities = []
+    song_notes = []
 
-    song_notes = {}
-
+    # Loop through the tracks to populate the details declared above.
     for track in source.tracks:
         for message in track:
             # A note_on can be velocity 0 which behaves like note_off.
@@ -26,13 +29,11 @@ def identify(source: mido.MidiFile) -> mido.MidiFile:
                 if message.velocity != 0:
                     velocities.append(message.velocity)
 
-
                 # Get a letter note from a midi pitch.
-                n = None
+                n = set()
                 for k, v in mab.NOTES.items():
                     if message.note in v:
-                        n = k
-                        break
+                        n.add(k)
 
                 if message.time < note_duration_min and message.time != 0:
                     note_duration_min = message.time
@@ -43,31 +44,72 @@ def identify(source: mido.MidiFile) -> mido.MidiFile:
                 if n is None:
                     continue
 
-                if n in song_notes:
-                    song_notes[n] += message.time
-                else:
-                    song_notes[n] = message.time
+                song_notes.append(n)
 
-    identity = "unknown"
-    possible_keys = []
-    for mode in list(mab.Mode):
+                for i in n:
+                    if i in note_durations:
+                        note_durations[i] += message.time
+                    else:
+                        note_durations[i] = message.time
+
+    identity = None
+    for mode in [
+        mab.MAJOR,
+        mab.MINOR,
+        mab.DORIAN,
+        mab.PHRYGIAN,
+        mab.LYDIAN,
+        mab.MIXOLYDIAN,
+        mab.LOCRIAN,
+    ]:
+        found = False
         for note in list(mab.Note):
-            key = getattr(mab, mode.name).notes(note)
+            key = mode.notes(note)
 
             key_valid = True
             for n in song_notes:
                 match = False
                 for enharmonic_set in key:
-                    if n in enharmonic_set:
+                    if n == enharmonic_set:
                         match = True
                         break
                 if not match:
                     key_valid = False
                     break
 
-            if key_valid and max(notes.items(), key=lambda x: x[1])[0] in key[0]:
-                # If the key is the tonal center, this is probably it.
-                identity = f"{note.value}_{mode.value}"
+            if key_valid:
+                identity = f"{note.value}_{mode.mode.value}"
+                if max(note_durations.items(), key=lambda x: x[1])[0] in key[0]:
+                    # If the key is the tonal center, this is probably it. This is better than
+                    # listing all possible keys that have the same notes but not the same tonal
+                    # center, I.e [c_minor, d_locrian, ds_ionian, f_dorian, g_phrygian, ...]
+                    found = True
+                    break
+        if found:
+            break
+
+    if identity is None:
+        # If we couldn't pin down an identity, we're working with a key with borrowed
+        # chords. Instead of trying to guess the closest key, just ID it by the tonal
+        # center + question mark.
+        identity = f"{max(note_durations.items(), key=lambda x: x[1])[0].value}_?"
+
+    # Get the canonical order for the notes
+    notes = set()
+    for s in song_notes:
+        notes |= s
+    notes = sorted(list(notes))
+    start = notes.index(identity.split("_")[0])
+    notes = [i.value for i in notes[start:] + notes[:start]]
+
+    # Remove the undesired variant of enharmonic equivalent notes.
+    for n in notes:
+        # When given a choice of enharmonic pairs, keep the variant
+        # that does not already have a single letter earlier in the scale.
+        # E.g. ['c', 'd', 'ds', 'eb'], remove 'ds'.
+        if (pair := mab.ENHARMONIC.get(n, None)) is not None:
+            if pair in notes and pair[0] in [i[0] for i in notes]:
+                notes.remove(n)
 
     results = {
         "type": source.type,
@@ -79,8 +121,8 @@ def identify(source: mido.MidiFile) -> mido.MidiFile:
         "velocity_mean": sum(velocities) // len(velocities),
         "velocity_median": sorted(velocities)[len(velocities) // 2],
         "velocity_mode": max(velocities, key=lambda x: velocities.count(x)),
-        "tonal_center": max(notes.items(), key=lambda x: x[1])[0],
-        "notes": " ".join([i[0] for i in sorted(song_notes.items(), key=lambda x: x[1], reverse=True)]),
+        "tonal_center": max(note_durations.items(), key=lambda x: x[1])[0].value,
+        "notes": notes,
         "key": identity,
     }
     return results

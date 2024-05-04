@@ -39,9 +39,11 @@ pip3 install --user --break-system-packages .
 # Usage
 
 ```
-usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--align] [--precision PRECISION] SOURCE DEST
+usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--align] [--precision PRECISION]
+                [--identify]
+                SOURCE [DEST]
 
-Read SOURCE midi file and save processed version to DEST
+The midi linter.
 
 positional arguments:
   SOURCE                the midi file to lint
@@ -53,7 +55,8 @@ options:
   --key KEY             the key to snap notes to. E.g. c_major or e_phrygian.
   --align               align the start and end of notes to intervals
   --precision PRECISION
-                        determines the size of the interval to align to. 1 is quarter note, 2 is
-                        eighth, 4 is sixteenth, etc
+                        determines the size of the interval to align to. 1 is quarter note,
+                        2 is eighth, 4 is sixteenth, etc
+  --identify            read information about a file
 ```
 
