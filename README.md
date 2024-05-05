@@ -7,6 +7,8 @@ Features:
 - Normalization. Set all notes to a particular velocity.
 - Pitch correction. Snap all notes to the specified key.
   This is naive and not the same as transposing.
+- Transposition. Transpose your song from any canonical key
+  to any other key based off scale degrees.
 - Align notes to intervals. Snap the start and end of notes
   to quarter note intervals or smaller depending on desired
   precision.
@@ -39,9 +41,7 @@ pip3 install --user --break-system-packages .
 # Usage
 
 ```
-usage: midilint [-h] [--velocity VELOCITY] [--key KEY] [--align] [--precision PRECISION]
-                [--identify]
-                SOURCE [DEST]
+usage: midilint [-h] [--velocity VELOCITY] [--snap SNAP] [--transpose TRANSPOSE] [--align] [--precision PRECISION] [--identify] SOURCE [DEST]
 
 The midi linter.
 
@@ -52,11 +52,12 @@ positional arguments:
 options:
   -h, --help            show this help message and exit
   --velocity VELOCITY   the velocity to set all notes to
-  --key KEY             the key to snap notes to. E.g. c_major or e_phrygian.
+  --snap SNAP           the key to snap notes to. E.g. c_major or e_phrygian.
+  --transpose TRANSPOSE
+                        the key to transpose to. E.g. c_major or e_phrygian.
   --align               align the start and end of notes to intervals
   --precision PRECISION
-                        determines the size of the interval to align to. 1 is quarter note,
-                        2 is eighth, 4 is sixteenth, etc
+                        determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc
   --identify            read information about a file
 ```
 
