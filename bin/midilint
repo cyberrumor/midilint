@@ -27,11 +27,18 @@ def main(source: Path, args) -> None:
     if args.velocity is not None:
         mid = midilint.normalize(mid, args.velocity)
 
-    # pitch correction
-    if args.key is not None:
-        note, mode = args.key.split("_")
+    # snap to pitch
+    if args.snap is not None:
+        note, mode = args.snap.split("_")
         notes = getattr(mab, mode.upper()).notes(note)
-        mid = midilint.correct_pitch(mid, notes)
+        mid = midilint.snap(mid, notes)
+
+    # Transpose based off scale degrees
+    if args.transpose is not None:
+        note, mode = args.transpose.split("_")
+        key = getattr(mab, mode.upper())
+        notes = key.notes(note)
+        mid = midilint.transpose(mid, notes)
 
     # note alignment
     if args.align:
@@ -63,7 +70,11 @@ if __name__ == "__main__":
     parser.add_argument("--velocity", type=int, help="the velocity to set all notes to")
 
     parser.add_argument(
-        "--key", type=str, help="the key to snap notes to. E.g. c_major or e_phrygian."
+        "--snap", type=str, help="the key to snap notes to. E.g. c_major or e_phrygian."
+    )
+
+    parser.add_argument(
+        "--transpose", type=str, help="the key to transpose to. E.g. c_major or e_phrygian."
     )
 
     parser.add_argument(
@@ -103,15 +114,18 @@ if __name__ == "__main__":
             )
 
     # Validate key
-    if args.key is not None:
-        keys = []
-        for n in list(mab.Note):
-            for m in list(mab.Mode):
-                keys.append(f"{n.value}_{m.value}")
-        if args.key not in keys:
-            raise ValueError(
-                f"key was {args.key} but must be one of:\n{'\n'.join(keys)}"
-            )
+    keys = []
+    for n in list(mab.Note):
+        for m in list(mab.Mode):
+            keys.append(f"{n.value}_{m.value}")
+    if args.snap is not None and args.snap not in keys:
+        raise ValueError(
+            f"--snap was {args.snap} but must be one of:\n{'\n'.join(keys)}"
+        )
+    if args.transpose is not None and args.transpose not in keys:
+        raise ValueError(
+            f"--transpose was {args.transpose} but must be one of:\n{'\n'.join(keys)}"
+        )
 
     source = args.SOURCE.absolute()
     main(source, args)

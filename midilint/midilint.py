@@ -174,12 +174,12 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
     return source
 
 
-def correct_pitch(
+def snap(
     source: mido.MidiFile,
     key: list[set[mab.Note]],
 ) -> mido.MidiFile:
     """
-    Snap pitches to notes in the given key via the strategy.
+    Snap pitches to their nearest note in the key.
     """
     notes = []
     for enharmonic_set in key:
@@ -189,4 +189,43 @@ def correct_pitch(
         for message in track:
             if message.type in ("note_on", "note_off"):
                 message.note = min(notes, key=lambda x: abs(x - message.note))
+    return source
+
+
+def transpose(
+    source: mido.MidiFile,
+    key: list[set[mab.Note]],
+) -> mido.MidiFile:
+    """
+    Transpose based on scale degrees. Requires an identifiable key.
+    """
+    original_key = identify(source)["key"]
+    if "?" in original_key:
+        raise ValueError("original key is unidentifiable, unable to transpose.")
+
+    note, mode = original_key.split("_")
+    original_key = getattr(mab, mode.upper()).notes(note)
+
+    for track in source.tracks:
+        for message in track:
+            if message.type in ("note_on", "note_off"):
+                note = None
+                for k, v in mab.NOTES.items():
+                    if message.note in v:
+                        note = k
+                        break
+
+                if note is None:
+                    # Note sure why this would happen, but still.
+                    continue
+
+                for degree, s in enumerate(original_key):
+                    if note in s:
+                        break
+
+                new = mab.NOTES[mab.Note(next(iter(key[degree])))]
+
+                # Get the note that's closest to the original octave.
+                message.note = min(new, key=lambda x: abs(x - message.note))
+
     return source

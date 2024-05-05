@@ -107,11 +107,11 @@ SOURCE = Path(__file__).parent / "files/c4_to_c5.mid"
         ),
     ],
 )
-def test_correct_pitch(key, expected):
+def test_snap(key, expected):
     mid = mido.MidiFile(SOURCE, clip=True)
     note, mode = key.split("_")
     notes = getattr(mab, mode.upper()).notes(note)
-    mid = midilint.correct_pitch(mid, notes)
+    mid = midilint.snap(mid, notes)
 
     i = 0
     for track in mid.tracks:
