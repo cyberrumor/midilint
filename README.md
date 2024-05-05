@@ -13,6 +13,30 @@ Features:
   to quarter note intervals or smaller depending on desired
   precision.
 
+
+# Usage
+
+```
+usage: midilint [-h] [--velocity VELOCITY] [--snap SNAP] [--transpose TRANSPOSE] [--align] [--precision PRECISION] [--identify] SOURCE [DEST]
+
+The midi linter.
+
+positional arguments:
+  SOURCE                the midi file to lint
+  DEST                  the name of the output file
+
+options:
+  -h, --help            show this help message and exit
+  --velocity VELOCITY   the velocity to set all notes to
+  --snap SNAP           the key to snap notes to. E.g. c_major or e_phrygian.
+  --transpose TRANSPOSE
+                        the key to transpose to. E.g. c_major or e_phrygian.
+  --align               align the start and end of notes to intervals
+  --precision PRECISION
+                        determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc
+  --identify            read information about a file
+```
+
 # Installation
 
 Install Python 3.10 or newer for your operating system. Mac users can install brew, then install
@@ -36,28 +60,5 @@ pip3 install --user --break-system-packages .
 
 # Add your python's user-local bin directory to your PATH, then restart your terminal.
 # The method by which you achieve this depends on your operating system.
-```
-
-# Usage
-
-```
-usage: midilint [-h] [--velocity VELOCITY] [--snap SNAP] [--transpose TRANSPOSE] [--align] [--precision PRECISION] [--identify] SOURCE [DEST]
-
-The midi linter.
-
-positional arguments:
-  SOURCE                the midi file to lint
-  DEST                  the name of the output file
-
-options:
-  -h, --help            show this help message and exit
-  --velocity VELOCITY   the velocity to set all notes to
-  --snap SNAP           the key to snap notes to. E.g. c_major or e_phrygian.
-  --transpose TRANSPOSE
-                        the key to transpose to. E.g. c_major or e_phrygian.
-  --align               align the start and end of notes to intervals
-  --precision PRECISION
-                        determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc
-  --identify            read information about a file
 ```
 
