@@ -76,7 +76,7 @@ import midilint
         ),
     ],
 )
-def test_identify(file, expected):
+def test_info(file, expected):
     mid = mido.MidiFile(file, clip=True)
-    result = midilint.identify(mid)
+    result = midilint.info(mid)
     assert result == expected

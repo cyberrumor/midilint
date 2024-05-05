@@ -18,8 +18,8 @@ def main(source: Path, args) -> None:
 
 
     # Identify then exit
-    if args.identify:
-        for k, v in midilint.identify(mid).items():
+    if args.info:
+        for k, v in midilint.info(mid).items():
             print(f"{k:<20} {v}")
         return
 
@@ -42,7 +42,7 @@ def main(source: Path, args) -> None:
 
     # note alignment
     if args.align:
-        mid = midilint.align(mid, args.precision)
+        mid = midilint.align(mid, args.align)
 
     # Save to dest if it was provided, otherwise
     # overwrite input file.
@@ -67,31 +67,26 @@ if __name__ == "__main__":
         nargs="?",
     )
 
-    parser.add_argument("--velocity", type=int, help="the velocity to set all notes to")
+    parser.add_argument("--velocity", type=int, help="the velocity to set all notes to", metavar="INT")
 
     parser.add_argument(
-        "--snap", type=str, help="the key to snap notes to. E.g. c_major or e_phrygian."
+        "--snap", type=str, help="the key to snap notes to. E.g. c_major or e_phrygian.", metavar="KEY"
     )
 
     parser.add_argument(
-        "--transpose", type=str, help="the key to transpose to. E.g. c_major or e_phrygian."
+        "--transpose", type=str, help="the key to transpose to. E.g. c_major or e_phrygian.", metavar="KEY"
     )
 
     parser.add_argument(
         "--align",
-        action="store_true",
-        help="align the start and end of notes to intervals",
-    )
-
-    parser.add_argument(
-        "--precision",
         type=int,
         default=1,
-        help="determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc",
+        metavar="INT",
+        help="align the start and end of notes to intervals. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc",
     )
 
     parser.add_argument(
-        "--identify",
+        "--info",
         action="store_true",
         help="read information about a file"
     )

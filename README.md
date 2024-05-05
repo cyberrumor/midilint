@@ -17,24 +17,21 @@ Features:
 # Usage
 
 ```
-usage: midilint [-h] [--velocity VELOCITY] [--snap SNAP] [--transpose TRANSPOSE] [--align] [--precision PRECISION] [--identify] SOURCE [DEST]
+usage: midilint [-h] [--velocity INT] [--snap KEY] [--transpose KEY] [--align INT] [--info] SOURCE [DEST]
 
 The midi linter.
 
 positional arguments:
-  SOURCE                the midi file to lint
-  DEST                  the name of the output file
+  SOURCE           the midi file to lint
+  DEST             the name of the output file
 
 options:
-  -h, --help            show this help message and exit
-  --velocity VELOCITY   the velocity to set all notes to
-  --snap SNAP           the key to snap notes to. E.g. c_major or e_phrygian.
-  --transpose TRANSPOSE
-                        the key to transpose to. E.g. c_major or e_phrygian.
-  --align               align the start and end of notes to intervals
-  --precision PRECISION
-                        determines the size of the interval to align to. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc
-  --identify            read information about a file
+  -h, --help       show this help message and exit
+  --velocity INT   the velocity to set all notes to
+  --snap KEY       the key to snap notes to. E.g. c_major or e_phrygian.
+  --transpose KEY  the key to transpose to. E.g. c_major or e_phrygian.
+  --align INT      align the start and end of notes to intervals. 1 is quarter note, 2 is eighth, 4 is sixteenth, etc
+  --info           read information about a file
 ```
 
 # Installation

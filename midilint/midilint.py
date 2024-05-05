@@ -8,7 +8,7 @@ import mido
 import midi_abstraction as mab
 
 
-def identify(source: mido.MidiFile) -> mido.MidiFile:
+def info(source: mido.MidiFile) -> mido.MidiFile:
     """
     Get information about a file.
     """
@@ -199,7 +199,7 @@ def transpose(
     """
     Transpose based on scale degrees. Requires an identifiable key.
     """
-    original_key = identify(source)["key"]
+    original_key = info(source)["key"]
     if "?" in original_key:
         raise ValueError("original key is unidentifiable, unable to transpose.")
 
