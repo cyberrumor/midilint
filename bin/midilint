@@ -2,7 +2,6 @@
 import sys
 import argparse
 from pathlib import Path
-from typing import Callable
 
 import mido
 import midi_abstraction as mab
@@ -15,7 +14,6 @@ def main(source: Path, args) -> None:
     Parse source, manipulate, save to dest.
     """
     mid = mido.MidiFile(source, clip=True)
-
 
     # Identify then exit
     if args.info:
@@ -52,7 +50,8 @@ def main(source: Path, args) -> None:
         mid.save(source)
 
 
-if __name__ == "__main__":
+def parse_args(args) -> argparse.Namespace:
+
     parser = argparse.ArgumentParser(
         prog=f"{Path(__file__).name}",
         description="The midi linter.",
@@ -67,14 +66,22 @@ if __name__ == "__main__":
         nargs="?",
     )
 
-    parser.add_argument("--velocity", type=int, help="the velocity to set all notes to", metavar="INT")
-
     parser.add_argument(
-        "--snap", type=str, help="the key to snap notes to. E.g. c_major or e_phrygian.", metavar="KEY"
+        "--velocity", type=int, help="the velocity to set all notes to", metavar="INT"
     )
 
     parser.add_argument(
-        "--transpose", type=str, help="the key to transpose to. E.g. c_major or e_phrygian.", metavar="KEY"
+        "--snap",
+        type=str,
+        help="the key to snap notes to. E.g. c_major or e_phrygian.",
+        metavar="KEY",
+    )
+
+    parser.add_argument(
+        "--transpose",
+        type=str,
+        help="the key to transpose to. E.g. c_major or e_phrygian.",
+        metavar="KEY",
     )
 
     parser.add_argument(
@@ -86,11 +93,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--info",
-        action="store_true",
-        help="read information about a file"
+        "--info", action="store_true", help="read information about a file"
     )
 
+    # This will the return value after some more validation.
     args = parser.parse_args()
 
     # Raise FileNotFoundError if SOURCE doesn't exist.
@@ -122,5 +128,11 @@ if __name__ == "__main__":
             f"--transpose was {args.transpose} but must be one of:\n{'\n'.join(keys)}"
         )
 
+    return args
+
+
+if __name__ == "__main__":
+    args = parse_args(sys.argv[1:])
     source = args.SOURCE.absolute()
+
     main(source, args)
