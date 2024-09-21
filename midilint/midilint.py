@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
-import sys
-import argparse
-from pathlib import Path
-from typing import Callable
 
 import mido
-import midi_abstraction as mab
+import midi_abstraction
 
 
 def info(source: mido.MidiFile) -> mido.MidiFile:
@@ -31,7 +27,7 @@ def info(source: mido.MidiFile) -> mido.MidiFile:
 
                 # Get a letter note from a midi pitch.
                 n = set()
-                for k, v in mab.NOTES.items():
+                for k, v in midi_abstraction.NOTES.items():
                     if message.note in v:
                         n.add(k)
 
@@ -42,6 +38,7 @@ def info(source: mido.MidiFile) -> mido.MidiFile:
 
                 # Skip counting drum durations for tonal center
                 if n is None:
+                    print("n is None")
                     continue
 
                 song_notes.append(n)
@@ -54,16 +51,16 @@ def info(source: mido.MidiFile) -> mido.MidiFile:
 
     identity = None
     for mode in [
-        mab.MAJOR,
-        mab.MINOR,
-        mab.DORIAN,
-        mab.PHRYGIAN,
-        mab.LYDIAN,
-        mab.MIXOLYDIAN,
-        mab.LOCRIAN,
+        midi_abstraction.MAJOR,
+        midi_abstraction.MINOR,
+        midi_abstraction.DORIAN,
+        midi_abstraction.PHRYGIAN,
+        midi_abstraction.LYDIAN,
+        midi_abstraction.MIXOLYDIAN,
+        midi_abstraction.LOCRIAN,
     ]:
         found = False
-        for note in list(mab.Note):
+        for note in list(midi_abstraction.Note):
             key = mode.notes(note)
 
             key_valid = True
@@ -107,7 +104,7 @@ def info(source: mido.MidiFile) -> mido.MidiFile:
         # When given a choice of enharmonic pairs, keep the variant
         # that does not already have a single letter earlier in the scale.
         # E.g. ['c', 'd', 'ds', 'eb'], remove 'ds'.
-        if (pair := mab.ENHARMONIC.get(n, None)) is not None:
+        if (pair := midi_abstraction.ENHARMONIC.get(n, None)) is not None:
             if pair in notes and pair[0] in [i[0] for i in notes]:
                 notes.remove(n)
 
@@ -176,14 +173,14 @@ def align(source: mido.MidiFile, precision: int = 1) -> mido.MidiFile:
 
 def snap(
     source: mido.MidiFile,
-    key: list[set[mab.Note]],
+    key: list[set[midi_abstraction.Note]],
 ) -> mido.MidiFile:
     """
     Snap pitches to their nearest note in the key.
     """
     notes = []
     for enharmonic_set in key:
-        notes.extend(mab.NOTES[next(iter(enharmonic_set))])
+        notes.extend(midi_abstraction.NOTES[next(iter(enharmonic_set))])
 
     for track in source.tracks:
         for message in track:
@@ -194,7 +191,7 @@ def snap(
 
 def transpose(
     source: mido.MidiFile,
-    key: list[set[mab.Note]],
+    key: list[set[midi_abstraction.Note]],
 ) -> mido.MidiFile:
     """
     Transpose based on scale degrees. Requires an identifiable key.
@@ -204,13 +201,13 @@ def transpose(
         raise ValueError("original key is unidentifiable, unable to transpose.")
 
     note, mode = original_key.split("_")
-    original_key = getattr(mab, mode.upper()).notes(note)
+    original_key = getattr(midi_abstraction, mode.upper()).notes(note)
 
     for track in source.tracks:
         for message in track:
             if message.type in ("note_on", "note_off"):
                 note = None
-                for k, v in mab.NOTES.items():
+                for k, v in midi_abstraction.NOTES.items():
                     if message.note in v:
                         note = k
                         break
@@ -223,7 +220,9 @@ def transpose(
                     if note in s:
                         break
 
-                new = mab.NOTES[mab.Note(next(iter(key[degree])))]
+                new = midi_abstraction.NOTES[
+                    midi_abstraction.Note(next(iter(key[degree])))
+                ]
 
                 # Get the note that's closest to the original octave.
                 message.note = min(new, key=lambda x: abs(x - message.note))
